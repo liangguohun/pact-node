@@ -1,5 +1,5 @@
 'use strict';
-
+require('events').EventEmitter.defaultMaxListeners = 10000;
 var checkTypes = require('check-types'),
 	_ = require('underscore'),
 	logger = require('./logger'),
@@ -16,8 +16,8 @@ var checkTypes = require('check-types'),
 	isWindows = process.platform === 'win32';
 
 var CHECKTIME = 500;
-var RETRY_AMOUNT = 60;
-var PROCESS_TIMEOUT = 30000;
+var RETRY_AMOUNT = 2;
+var PROCESS_TIMEOUT = 3000;
 
 // Constructor
 function Server(port, host, dir, ssl, sslcert, sslkey, cors, log, spec, consumer, provider) {
@@ -39,10 +39,10 @@ function Server(port, host, dir, ssl, sslcert, sslkey, cors, log, spec, consumer
 	this.DELETE_EVENT = 'delete';
 }
 
-util.inherits(Server, eventEmitter);
-
+util.inherits(Server, eventEmitter)
 // Let the mocking begin!
 Server.prototype.start = function () {
+
 	if (this._instance && this._instance.connected) {
 		logger.warn('You already have a process running with PID: ' + this._instance.pid);
 		return;
@@ -334,6 +334,5 @@ module.exports = function (options) {
 	if (options.provider) {
 		checkTypes.assert.string(options.provider);
 	}
-
 	return new Server(options.port, options.host, options.dir, options.ssl, options.sslcert, options.sslkey, options.cors, options.log, options.spec, options.consumer, options.provider);
 };
